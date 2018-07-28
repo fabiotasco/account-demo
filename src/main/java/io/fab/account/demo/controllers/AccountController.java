@@ -15,9 +15,11 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.fab.account.demo.canonicals.Response;
+import io.fab.account.demo.data.Account;
 import io.fab.account.demo.data.Transaction;
 import io.fab.account.demo.data.TransactionType;
 import io.fab.account.demo.dto.AccountTransactionDto;
+import io.fab.account.demo.dto.EnrollDto;
 import io.fab.account.demo.rules.AccountRules;
 
 @RestController
@@ -28,6 +30,12 @@ public class AccountController {
 	@Autowired
 	private AccountRules accountRules;
 
+	@PostMapping("/enroll")
+	public Response<Account> enroll(@RequestBody EnrollDto enrollDto) {
+		Account account = accountRules.enroll(enrollDto);
+		return new Response<>(account);
+	}
+
 	@GetMapping("/pan/{pan}/balance")
 	public Response<Double> getBalance(@PathVariable final String pan) {
 		final Double balance = accountRules.getBalance(pan);
@@ -36,8 +44,8 @@ public class AccountController {
 
 	@PostMapping("/purchase")
 	public Response<Transaction> purchase(@RequestBody final AccountTransactionDto accountTransactionDto) {
-		final Transaction transaction =
-				accountRules.processTransaction(accountTransactionDto, TransactionType.PURCHASE);
+		final Transaction transaction = accountRules.processTransaction(accountTransactionDto,
+				TransactionType.PURCHASE);
 		return new Response<>(transaction);
 	}
 

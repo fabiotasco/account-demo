@@ -11,6 +11,7 @@ import io.fab.account.demo.data.Account;
 import io.fab.account.demo.data.Transaction;
 import io.fab.account.demo.data.TransactionType;
 import io.fab.account.demo.dto.AccountTransactionDto;
+import io.fab.account.demo.dto.EnrollDto;
 import io.fab.account.demo.exceptions.AccountNotFoundException;
 import io.fab.account.demo.exceptions.TransactionAlreadyCanceledException;
 import io.fab.account.demo.exceptions.TransactionNotFoundException;
@@ -28,6 +29,18 @@ public class AccountRules {
 
 	@Autowired
 	private TransactionCalculator calculator;
+
+	public Account enroll(EnrollDto enrollDto) {
+		try {
+			return findAccount(enrollDto.getPhoneNumber());
+		} catch (AccountNotFoundException e) {
+			// Cria a conta, caso ainda não exista!
+			Account account = new Account(enrollDto.getPhoneNumber(), 0.0);
+			accountRepository.save(account);
+
+			return account;
+		}
+	}
 
 	public Double getBalance(final String pan) {
 		final Account account = findAccount(pan);
@@ -57,8 +70,8 @@ public class AccountRules {
 			if (isTransactionAlreadyCanceled(original)) {
 				throw new TransactionAlreadyCanceledException(original);
 			}
-			final Transaction cancelTransaction =
-					new Transaction(TransactionType.CANCEL, original.getAmount(), original.getAccount(), original);
+			final Transaction cancelTransaction = new Transaction(TransactionType.CANCEL, original.getAmount(),
+					original.getAccount(), original);
 			calculator.calculate(cancelTransaction);
 			transactionRespository.save(cancelTransaction);
 
@@ -79,10 +92,8 @@ public class AccountRules {
 
 	private boolean isTransactionAlreadyCanceled(final Transaction original) {
 		final List<Transaction> transactions = transactionRespository.findByOriginal(original);
-		return transactions.parallelStream()
-				.filter(transaction -> transaction.getType() == TransactionType.CANCEL)
-				.findFirst()
-				.isPresent();
+		return transactions.parallelStream().filter(transaction -> transaction.getType() == TransactionType.CANCEL)
+				.findFirst().isPresent();
 	}
 
 }

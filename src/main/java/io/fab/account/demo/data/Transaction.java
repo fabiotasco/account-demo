@@ -26,8 +26,6 @@ import com.fasterxml.jackson.annotation.JsonFormat.Shape;
 
 /**
  * Transação realizada na conta. Os tipos de transações permitidas estão definidas em {@link TransactionType}.
- *
- * @author 4ward:Fabio
  */
 @Entity
 @Table(name = "transaction")

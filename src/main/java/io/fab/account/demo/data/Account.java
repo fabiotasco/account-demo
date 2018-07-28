@@ -16,8 +16,6 @@ import javax.persistence.Table;
 
 /**
  * Conta vinculada a um PAN.
- *
- * @author 4ward:Fabio
  */
 @Entity
 @Table(name = "account")
